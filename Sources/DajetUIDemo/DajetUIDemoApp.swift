@@ -3,32 +3,33 @@ import DajetUI
 
 @main
 struct DajetUIDemoApp: App {
+    init() {
+        // Выбранный в прошлый раз вид — до первого рисования окна: открыть
+        // в системном и переодеть мгновение спустя — окно, что упало.
+        Look.current.apply()
+    }
+
     var body: some Scene {
         Window("DajetUI — токены", id: "styleguide") {
             StyleGuideWindow()
         }
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 760, height: 720)
-    }
-}
 
-/// Одевает окно как окна линейки: прозрачный тайтлбар, контент на всю высоту.
-private struct WindowDress: NSViewRepresentable {
-    func makeNSView(context: Context) -> NSView {
-        let view = NSView()
-        view.window.map(dress)
-        return view
-    }
+        Window("Рецепт: системный тулбар", id: "recipe-toolbar") {
+            ToolbarRecipeWindow()
+        }
+        .dajetToolbarWindow()
+        .defaultSize(width: 560, height: 480)
 
-    func updateNSView(_ view: NSView, context: Context) {
-        view.window.map(dress)
-    }
-
-    private func dress(_ window: NSWindow) {
-        window.titlebarAppearsTransparent = true
-        window.titleVisibility = .hidden
-        window.styleMask.insert(.fullSizeContentView)
-        window.isMovableByWindowBackground = true
+        DajetSettings {
+            SettingsTab(title: "Общие", icon: "gear") {
+                GeneralTab()
+            }
+            SettingsTab(title: "Внешний вид", icon: "paintbrush") {
+                LookTab()
+            }
+        }
     }
 }
 
@@ -47,6 +48,9 @@ private struct StyleGuideWindow: View {
                         GuideSection("Компоненты") {
                             ComponentGallery(onShowPlate: { showPlate = true })
                         }
+                        GuideSection("Внешний вид") {
+                            LookDemo()
+                        }
                         GuideSection("Палитра") {
                             PaletteGrid()
                         }
@@ -64,7 +68,7 @@ private struct StyleGuideWindow: View {
                                 .font(Typography.mono)
                                 .foregroundStyle(Palette.muted)
                         }
-                        Text("Этап 2 — компоненты-минимум. Далее: рецепты окна, тулбара и Settings.")
+                        Text("Этап 3 — рецепты: внешний вид, окно, тулбар и настройки. ⌘, — настройки")
                             .font(Typography.caption)
                             .foregroundStyle(Palette.faint)
                             .padding(.top, 4)
@@ -79,8 +83,12 @@ private struct StyleGuideWindow: View {
             }
         }
         .animation(Motion.settle, value: showPlate)
+        .onExitCommand {
+            // Крест плиты обещает esc — слово держим, пока плита открыта.
+            if showPlate { withAnimation(Motion.settle) { showPlate = false } }
+        }
         .background(Palette.ground)
-        .background(WindowDress())
+        .dajetPlateWindow(movableByBackground: true)
     }
 }
 
@@ -120,6 +128,107 @@ private struct PlateOverlay: View {
                     Pill("Готово", filled: true, action: onClose)
                 }
             }
+            .transition(.scale(scale: 0.97).combined(with: .opacity))
+        }
+    }
+}
+
+/// Живая демонстрация рецепта тулбара: системная полоса с дверьми линейки.
+private struct ToolbarRecipeWindow: View {
+    @State private var switchOn = true
+    @State private var theme = "auto"
+    @State private var scale = 1.0
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Caption("Воспроизведение")
+                Card {
+                    Line("Показывать счётчик", "Верхняя полоса, правый край") {
+                        InkSwitch(on: $switchOn)
+                    }
+                    Rule()
+                    Line("Тема оформления") {
+                        Segmented([("light", "Светлая"), ("dark", "Тёмная"), ("auto", "Авто")], selection: $theme)
+                    }
+                    Rule()
+                    Line("Масштаб интерфейса") {
+                        Steps(stops: [0.75, 1, 1.25, 1.5], value: $scale, home: 1) {
+                            String(format: "%.2f×", $0)
+                        }
+                    }
+                }
+            }
+            .padding(24)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .background(Palette.ground)
+        .dajetToolbarWindow()
+        .toolbar {
+            ToolbarItem {
+                Door("sidebar.left", help: "Сайдбар") {}
+            }
+            ToolbarItem {
+                Door("plus", help: "Добавить") {}
+            }
+        }
+    }
+}
+
+/// Вкладка «Общие» настроек демо: секции Caption + Card{Line…Rule…}.
+private struct GeneralTab: View {
+    @State private var autoplay = true
+    @State private var reopen = true
+    @State private var crossfade = 4.0
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Caption("Запуск")
+            Card {
+                Line("Автовоспроизведение", "Запускать при открытии приложения") {
+                    InkSwitch(on: $autoplay)
+                }
+                Rule()
+                Line("Восстанавливать окно", "Открывать там, где оно было закрыто") {
+                    InkSwitch(on: $reopen)
+                }
+            }
+            Caption("Воспроизведение")
+            Card {
+                Line("Переход между треками", "Фейд на стыке, секунды") {
+                    Steps(stops: [0, 2, 4, 8], value: $crossfade, home: 4) {
+                        $0 == 0 ? "выкл" : "\(Int($0)) с"
+                    }
+                }
+            }
+        }
+        .frame(width: 560, alignment: .leading)
+    }
+}
+
+/// Вкладка «Внешний вид» настроек демо: пикер из рецепта Look.
+private struct LookTab: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Caption("Тема")
+            Card {
+                Line("Оформление", "Светлая, тёмная или как у Mac — применяется ко всему приложению") {
+                    LookPicker()
+                }
+            }
+        }
+        .frame(width: 560, alignment: .leading)
+    }
+}
+
+/// Секция «Внешний вид» гайда: пикер, меняющий всю app живьём.
+private struct LookDemo: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            LookPicker()
+            Text("system · light · dark — выбор помнится между запусками")
+                .font(Typography.mono)
+                .foregroundStyle(Palette.muted)
         }
     }
 }
@@ -222,6 +331,7 @@ private struct TypeRows: View {
         ("display", Typography.display, "Заголовок панели"),
         ("body", Typography.body, "Основной текст интерфейса"),
         ("bodyMuted", Typography.bodyMuted, "Пояснение под контролем"),
+        ("control", Typography.control, "Пилюля · сегмент · подпись строки"),
         ("label", Typography.label, "СЕКЦИЯ · МЕТКА"),
         ("caption", Typography.caption, "Бейдж и мелкие подписи"),
         ("mono", Typography.mono, "03:45 · 128 kbps"),
@@ -292,7 +402,7 @@ private struct MotionDemo: View {
                     .offset(x: settled ? 120 : 0)
             }
             .frame(maxWidth: .infinity)
-            Text("settle 0.30/0.86 · glide 0.34/0.82 · quick 0.14")
+            Text("settle 0.30/0.86 · glide 0.34/0.82 · quick 0.14 — nil при «Уменьшить движение»")
                 .font(Typography.mono)
                 .foregroundStyle(Palette.muted)
         }
