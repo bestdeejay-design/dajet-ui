@@ -33,42 +33,94 @@ private struct WindowDress: NSViewRepresentable {
 }
 
 private struct StyleGuideWindow: View {
+    @State private var showPlate = false
+
     var body: some View {
-        VStack(spacing: 0) {
-            TopStrip()
-            Rectangle()
-                .fill(Palette.hairline)
-                .frame(height: 1)
-            ScrollView {
-                VStack(alignment: .leading, spacing: 28) {
-                    GuideSection("Палитра") {
-                        PaletteGrid()
+        ZStack {
+            VStack(spacing: 0) {
+                TopStrip()
+                Rectangle()
+                    .fill(Palette.hairline)
+                    .frame(height: 1)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 28) {
+                        GuideSection("Компоненты") {
+                            ComponentGallery(onShowPlate: { showPlate = true })
+                        }
+                        GuideSection("Палитра") {
+                            PaletteGrid()
+                        }
+                        GuideSection("Типографика") {
+                            TypeRows()
+                        }
+                        GuideSection("Скругления") {
+                            RadiusRow()
+                        }
+                        GuideSection("Движение") {
+                            MotionDemo()
+                        }
+                        GuideSection("Метрики хрома") {
+                            Text("strip 52 · door 26 · row 26 · side 232 (176–440) · tab 186")
+                                .font(Typography.mono)
+                                .foregroundStyle(Palette.muted)
+                        }
+                        Text("Этап 2 — компоненты-минимум. Далее: рецепты окна, тулбара и Settings.")
+                            .font(Typography.caption)
+                            .foregroundStyle(Palette.faint)
+                            .padding(.top, 4)
                     }
-                    GuideSection("Типографика") {
-                        TypeRows()
-                    }
-                    GuideSection("Скругления") {
-                        RadiusRow()
-                    }
-                    GuideSection("Движение") {
-                        MotionDemo()
-                    }
-                    GuideSection("Метрики хрома") {
-                        Text("strip 52 · door 26 · row 26 · side 232 (176–440) · tab 186")
-                            .font(Typography.mono)
-                            .foregroundStyle(Palette.muted)
-                    }
-                    Text("Этап 1 — токены. Далее: компоненты-минимум и рецепты окна.")
-                        .font(Typography.caption)
-                        .foregroundStyle(Palette.faint)
-                        .padding(.top, 4)
+                    .padding(24)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(24)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            if showPlate {
+                PlateOverlay(onClose: { withAnimation(Motion.settle) { showPlate = false } })
+                    .transition(.opacity)
             }
         }
+        .animation(Motion.settle, value: showPlate)
         .background(Palette.ground)
         .background(WindowDress())
+    }
+}
+
+/// Живая демонстрация плиты: затемнение и панель, как в браузере.
+private struct PlateOverlay: View {
+    let onClose: () -> Void
+
+    @State private var autoplay = true
+    @State private var theme = "auto"
+    @State private var scale = 1.0
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.10)
+                .ignoresSafeArea()
+                .onTapGesture(perform: onClose)
+            Plate("Настройки", close: onClose) {
+                Card {
+                    Line("Автовоспроизведение", "Запускать при открытии приложения") {
+                        InkSwitch(on: $autoplay)
+                    }
+                    Rule()
+                    Line("Тема оформления") {
+                        Segmented([("light", "Светлая"), ("dark", "Тёмная"), ("auto", "Авто")], selection: $theme)
+                    }
+                    Rule()
+                    Line("Масштаб интерфейса") {
+                        Steps(stops: [0.75, 1, 1.25, 1.5], value: $scale, home: 1) {
+                            String(format: "%.2f×", $0)
+                        }
+                    }
+                }
+            } foot: {
+                HStack {
+                    Quick("Сбросить", act: {})
+                    Spacer()
+                    Pill("Готово", filled: true, action: onClose)
+                }
+            }
+        }
     }
 }
 
@@ -243,6 +295,59 @@ private struct MotionDemo: View {
             Text("settle 0.30/0.86 · glide 0.34/0.82 · quick 0.14")
                 .font(Typography.mono)
                 .foregroundStyle(Palette.muted)
+        }
+    }
+}
+
+private struct ComponentGallery: View {
+    let onShowPlate: () -> Void
+
+    @State private var hunt = ""
+    @FocusState private var focus: Bool
+    @State private var doorOn = true
+    @State private var switchOn = true
+    @State private var theme = "auto"
+    @State private var scale = 1.0
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Hunt(text: $hunt, prompt: "Поиск по настройкам", focus: $focus)
+                .frame(width: 320, alignment: .leading)
+
+            HStack(spacing: 10) {
+                Door("sidebar.left", on: doorOn, help: "Сайдбар") { withAnimation(Motion.settle) { doorOn.toggle() } }
+                Door("plus", help: "Добавить") {}
+                Door("xmark", help: "Закрыть") {}
+                Spacer()
+            }
+
+            Segmented([("light", "Светлая"), ("dark", "Тёмная"), ("auto", "Авто")], selection: $theme, wide: true)
+                .frame(width: 320)
+
+            HStack(spacing: 10) {
+                InkSwitch(on: $switchOn)
+                Pill("Сохранить", filled: true, action: onShowPlate)
+                Pill("Отмена", action: {})
+                Quick("Копировать", act: {})
+                Spacer()
+            }
+
+            Card {
+                Line("Показывать счётчик", "Верхняя полоса, правый край") {
+                    InkSwitch(on: $switchOn)
+                }
+                Rule()
+                Line("Тема оформления") {
+                    Segmented([("light", "Светлая"), ("dark", "Тёмная"), ("auto", "Авто")], selection: $theme)
+                }
+                Rule()
+                Line("Масштаб интерфейса") {
+                    Steps(stops: [0.75, 1, 1.25, 1.5], value: $scale, home: 1) {
+                        String(format: "%.2f×", $0)
+                    }
+                }
+            }
+            .frame(width: 480, alignment: .leading)
         }
     }
 }
