@@ -1,0 +1,51 @@
+import SwiftUI
+
+/// Единая палитра Dajet — основа интерфейса всех приложений линейки.
+///
+/// Ахроматические пары сняты с браузера Dajet (эталонный интерфейс владельца,
+/// `Design.swift`), акцент — фирменная терракота из brand-пакета, как у плеера
+/// и редактора. Каждый токен — пара светлой и тёмной темы через dynamic
+/// provider, поэтому смена light/dark происходит системой автоматически.
+public enum Palette {
+    /// Фон окна.
+    public static let ground = pair(0xFFFFFF, 0x1C1C1C)
+    /// Основной текст.
+    public static let ink = pair(0x171717, 0xEDEDED)
+    /// Вторичный текст.
+    public static let muted = pair(0x8C8C8C, 0x949494)
+    /// Подложки-призраки, выключенные контролы.
+    public static let faint = pair(0xD4D4D4, 0x525252)
+    /// Волосяные линии и обводки.
+    public static let hairline = pair(0xE8E8E8, 0x333333)
+    /// Заливка полей ввода и «мыльных» поверхностей.
+    public static let wash = pair(0xEFEFEF, 0x2D2D2D)
+    /// Состояние наведения.
+    public static let hover = pair(0xF6F6F6, 0x262626)
+    /// Терракота — единственный цветовой акцент линейки (brand).
+    public static let accent = pair(0xC1542B, 0xE8AE8C)
+    /// Текст и глифы на залитой акцентом поверхности.
+    public static let onAccent = pair(0xFFFFFF, 0x0E0F11)
+    /// Успех, «безопасно».
+    public static let positive = pair(0x14803D, 0x4ADE80)
+    /// Внимание, «осторожно».
+    public static let caution = pair(0xB5540A, 0xFABF24)
+
+    /// Парный цвет light/dark на основе hex-значений.
+    public static func pair(_ light: UInt64, _ dark: UInt64) -> Color {
+        Color(nsColor: NSColor(name: nil) { appearance in
+            let isDark = appearance.bestMatch(from: [.darkAqua, .vibrantDark]) != nil
+            return NSColor(hex: isDark ? dark : light)
+        })
+    }
+}
+
+extension NSColor {
+    convenience init(hex: UInt64) {
+        self.init(
+            red: CGFloat((hex >> 16) & 0xFF) / 255,
+            green: CGFloat((hex >> 8) & 0xFF) / 255,
+            blue: CGFloat(hex & 0xFF) / 255,
+            alpha: 1
+        )
+    }
+}
