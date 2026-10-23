@@ -133,7 +133,7 @@ public struct Line<Control: View>: View {
                     .foregroundStyle(Palette.ink)
                 if let detail {
                     Text(detail)
-                        .font(.system(size: 11.5))
+                        .font(Typography.control)
                         .foregroundStyle(Palette.muted)
                         .lineLimit(3)
                         .fixedSize(horizontal: false, vertical: true)
@@ -157,7 +157,7 @@ public struct Caption: View {
 
     public var body: some View {
         Text(text)
-            .font(.system(size: 11.5, weight: .medium))
+            .font(Typography.control.weight(.medium))
             .foregroundStyle(Palette.muted)
             .padding(.leading, 2)
     }
@@ -216,7 +216,7 @@ public struct Hunt: View {
             if !text.isEmpty {
                 Button { text = "" } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(Typography.label)
+                        .font(.system(size: 11))
                         .foregroundStyle(Palette.faint)
                 }
                 .buttonStyle(.plain)

@@ -17,6 +17,10 @@ public enum Typography {
     public static let label = Font.system(size: 11, weight: .medium)
     /// Мелкие подписи, бейджи, тайминги.
     public static let caption = Font.system(size: 10)
+    /// Подписи контролов: пилюли, сегменты, пояснения строк, капс-заголовки
+    /// настроек. Шаг 11.5 — самый частый размер интерфейса браузера; вес
+    /// обычный, наращивается на месте (`control.weight(.medium)`).
+    public static let control = Font.system(size: 11.5)
     /// Моноширинный: таймкоды, счётчики, числа в интерфейсе.
     public static let mono = Font.system(size: 11, design: .monospaced)
 }

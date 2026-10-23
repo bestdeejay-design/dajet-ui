@@ -6,7 +6,7 @@ public enum Metrics {
     public static let strip: CGFloat = 52
     /// Квадратная иконочная кнопка («дверь»).
     public static let door: CGFloat = 26
-    /// Строка списка.
+    /// Строка статуса/сплит-режима; строки сайдбара — 28, настроек — 30.
     public static let row: CGFloat = 26
     /// Идеальная ширина сайдбара.
     public static let side: CGFloat = 232
@@ -29,7 +29,7 @@ public enum Radius {
     /// Поля ввода.
     public static let field: CGFloat = 10
     /// Карточки-строки, группы в панелях.
-    public static let item: CGFloat = 12
+    public static let item: CGFloat = 11
     /// Модальные панели и крупные карточки.
     public static let panel: CGFloat = 16
 }

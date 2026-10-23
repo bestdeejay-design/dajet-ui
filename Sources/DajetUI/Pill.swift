@@ -1,12 +1,15 @@
 import SwiftUI
 
-/// Маленькая капсула, делающая одно дело. По умолчанию контурная;
-/// залита ink, когда это то, ради чего пришли. Порт пилюли браузера
-/// Dajet (`Settings.swift`) на токенах пакета.
+/// Маленькая капсула, делающая одно дело. По умолчанию контурная на фоне
+/// окна; залита акцентом, когда это то, ради чего пришли. Порт пилюли
+/// браузера Dajet (`Settings.swift`) на токенах пакета.
 public struct Pill: View {
     let title: String
     var filled = false
+    /// Цвет текста незалитой пилюли.
     var tint: Color = Palette.ink
+    /// Цвет заливки залитой пилюли; текст на ней — `onAccent`.
+    var fill: Color = Palette.accent
     let action: () -> Void
 
     @State private var hovering = false
@@ -15,25 +18,25 @@ public struct Pill: View {
         _ title: String,
         filled: Bool = false,
         tint: Color = Palette.ink,
+        fill: Color = Palette.accent,
         action: @escaping () -> Void
     ) {
         self.title = title
         self.filled = filled
         self.tint = tint
+        self.fill = fill
         self.action = action
     }
 
     public var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 11.5))
+                .font(Typography.control)
                 .foregroundStyle(filled ? Palette.onAccent : tint)
-                .padding(.horizontal, 12)
+                .padding(.horizontal, 10)
                 .padding(.vertical, 5)
-                .background(
-                    Capsule().fill(filled ? Palette.accent : (hovering ? Palette.hover : Palette.wash))
-                )
-                .overlay(Capsule().strokeBorder(Palette.hairline, lineWidth: 1))
+                .background(filled ? fill : (hovering ? Palette.hover : Palette.ground), in: Capsule())
+                .overlay(Capsule().strokeBorder(filled ? .clear : Palette.hairline, lineWidth: 1))
                 .contentShape(Capsule())
         }
         .buttonStyle(.plain)
@@ -58,7 +61,7 @@ public struct Quick: View {
     public var body: some View {
         Button(action: act) {
             Text(title)
-                .font(.system(size: 11.5))
+                .font(Typography.control)
                 .foregroundStyle(tint)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
@@ -99,13 +102,14 @@ public struct Steps: View {
             Step(icon: "minus", to: below) { value = $0 }
             Button { value = home } label: {
                 Text(label(value))
-                    .font(Typography.bodyMuted)
+                    .font(Typography.control)
                     .monospacedDigit()
                     .foregroundStyle(Palette.ink)
                     .frame(minWidth: 36)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .help("Back to \(label(home))")
             Step(icon: "plus", to: above) { value = $0 }
         }
         .padding(.horizontal, 2)

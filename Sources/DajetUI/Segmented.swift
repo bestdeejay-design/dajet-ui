@@ -26,7 +26,7 @@ public struct Segmented<Option: Hashable>: View {
         HStack(spacing: 2) {
             ForEach(options, id: \.0) { option, title in
                 Text(title)
-                    .font(.system(size: 11.5, weight: option == selection ? .medium : .regular))
+                    .font(option == selection ? Typography.control.weight(.medium) : Typography.control)
                     .foregroundStyle(option == selection ? Palette.ink : Palette.muted)
                     .lineLimit(1)
                     .fixedSize(horizontal: !wide, vertical: false)
