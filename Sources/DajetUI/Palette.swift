@@ -21,6 +21,10 @@ public enum Palette {
     public static let wash = pair(0xEFEFEF, 0x2D2D2D)
     /// Состояние наведения.
     public static let hover = pair(0xF6F6F6, 0x262626)
+    /// «Живой» пин на полосе (вкладка закреплена, приложение активно).
+    public static let pinLive = pair(0xE6E6E6, 0x363636)
+    /// Покой полосы: приложение неактивно, хром притухает.
+    public static let resting = pair(0xCCCCCC, 0x4D4D4D)
     /// Терракота — единственный цветовой акцент линейки (brand).
     public static let accent = pair(0xC1542B, 0xE8AE8C)
     /// Текст и глифы на залитой акцентом поверхности.

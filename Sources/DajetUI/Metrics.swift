@@ -16,6 +16,18 @@ public enum Metrics {
     public static let sideMax: CGFloat = 440
     /// Ширина вкладки браузера.
     public static let tabWidth: CGFloat = 186
+    /// Минимальная ширина вкладки при сжатии полосы.
+    public static let tabMinWidth: CGFloat = 36
+    /// Зазор между вкладками.
+    public static let tabGap: CGFloat = 2
+    /// Ширина блока traffic lights.
+    public static let lights: CGFloat = 100
+    /// Ширина «штурвала» — блока кнопок центра: три двери, два зазора, поле.
+    public static let helm: CGFloat = 94
+    /// Пустая полоса без содержимого.
+    public static let bare: CGFloat = 34
+    /// Ширина адресного поля.
+    public static let fieldWidth: CGFloat = 560
 }
 
 /// Шкала скруглений: в браузере сейчас 12 разных значений (3…18),
