@@ -61,8 +61,9 @@ swift run DajetUIDemo
 ## Дорожная карта
 
 - Этап 1 — токены · Этап 2 — компоненты · Этап 3 — рецепты (✅ в main)
-- Дальше: рецепт материалов/стекла (эталон — Glass плеера), accessibility-слой,
-  перевод 226 хардкод-размеров браузера на `Typography`, Tests-пин токенов
+- Дальше: рецепт материалов/стекла **по паттернам Apple** (системное стекло в
+  системном хроме, NSGlassEffectView для кастомного UI — самодельное не переносим),
+  перевод 226 хардкод-размеров браузера на `Typography`, Theme/Appearance → Look
 
 Доска проекта: https://github.com/users/bestdeejay-design/projects/4
 Аудит SZ: https://github.com/bestdeejay-design/dajet-ui/issues/1

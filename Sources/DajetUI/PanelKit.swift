@@ -189,15 +189,18 @@ public struct Nothing: View {
 public struct Hunt: View {
     @Binding var text: String
     var prompt = "Search"
+    var clearLabel = "Clear"
     var focus: FocusState<Bool>.Binding
 
     public init(
         text: Binding<String>,
-        prompt: String = "Поиск",
+        prompt: String = "Search",
+        clearLabel: String = "Clear",
         focus: FocusState<Bool>.Binding
     ) {
         self._text = text
         self.prompt = prompt
+        self.clearLabel = clearLabel
         self.focus = focus
     }
 
@@ -223,7 +226,7 @@ public struct Hunt: View {
                         .foregroundStyle(Palette.faint)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Clear")
+                .accessibilityLabel(clearLabel)
             }
         }
         .padding(.horizontal, 12)

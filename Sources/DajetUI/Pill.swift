@@ -34,7 +34,7 @@ public struct Pill: View {
         Button(action: action) {
             Text(title)
                 .font(Typography.control)
-                .foregroundStyle(filled ? Palette.onAccent : tint)
+                .foregroundStyle(filled ? Palette.ground : tint)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
                 .background(filled ? fill : (hovering ? Palette.hover : Palette.ground), in: Capsule())

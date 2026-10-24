@@ -70,6 +70,12 @@ final class TokenTests: XCTestCase {
         XCTAssertEqual(Radius.item, 11)
         XCTAssertEqual(Radius.panel, 16)
         XCTAssertEqual(Spacing.xxs, 2)
+        XCTAssertEqual(Spacing.xs, 4)
+        XCTAssertEqual(Spacing.s, 6)
+        XCTAssertEqual(Spacing.m, 8)
+        XCTAssertEqual(Spacing.l, 10)
+        XCTAssertEqual(Spacing.xl, 12)
+        XCTAssertEqual(Spacing.xxl, 14)
         XCTAssertEqual(Spacing.xxxl, 16)
     }
 

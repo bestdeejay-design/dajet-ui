@@ -67,7 +67,7 @@ public struct LookPicker: View {
     }
 
     public var body: some View {
-        Segmented(Look.allCases.map { ($0, titles[$0] ?? "") }, selection: $look)
+        Segmented(Look.allCases.map { ($0, titles[$0] ?? $0.rawValue.capitalized) }, selection: $look)
             .frame(width: 260)
             .onChange(of: look) {
                 Look.remember(look)
