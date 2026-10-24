@@ -28,9 +28,10 @@ public enum Motion {
         reduced ? nil : .easeOut(duration: 0.14)
     }
 
-    /// Просила ли Система меньше движения. Приватно, чтобы не сталкиваться
-    /// с собственными расширениями `Motion` у потребителей пакета.
-    private static var reduced: Bool {
+    /// Просит ли Система меньше движения. Публично: приложения линейки
+    /// читают это для собственных эффектов (встряска поля браузера,
+    /// танец иконки трея плеера) — одного источника достаточно.
+    public static var reduced: Bool {
         NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
     }
 }

@@ -22,8 +22,9 @@ public enum Metrics {
     public static let tabGap: CGFloat = 2
     /// Ширина блока traffic lights.
     public static let lights: CGFloat = 100
-    /// Ширина «штурвала» — блока кнопок центра: три двери, два зазора, поле.
-    public static let helm: CGFloat = 94
+    /// Ширина «штурвала» — блока кнопок центра: три двери, два зазора, поле
+    /// (3·26 + 2·2 + 8 = 90, как в браузере).
+    public static let helm: CGFloat = 90
     /// Пустая полоса без содержимого.
     public static let bare: CGFloat = 34
     /// Ширина адресного поля.

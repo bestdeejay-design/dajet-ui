@@ -8,23 +8,46 @@
 1. **Система-first.** Всё, что даёт система (контролы, тулбары, Settings-сцены,
    материалы Liquid Glass), — берём системой. Пакет не повторяет систему, а
    встраивается в неё.
-2. **Минимум видимых компонентов.** Кастомное — только то, чего нет в системе:
-   `Door`, `Switch`, `Segmented`, `Pill`, `Plate/Card/Line`, `Hunt`.
+2. **Минимум видимых компонентов.** Кастомное — только то, чего нет в системе.
 3. **Один источник чисел.** Палитра, типографика, скругления, отступы, движение —
    токены пакета, а не магические числа в приложениях.
 4. **Терракота — единственный цветовой акцент** (`#C1542B` light / `#E8AE8C`
-   dark, из brand-пакета). Всё остальное — ахроматическая шкала браузера.
+   dark, из brand-пакета). Дефолт залитой пилюли — ink, терракота — параметром.
+   Всё остальное — ахроматическая шкала браузера.
 
-## Состав (этап 1 — токены)
+## Подключение
 
-| Токен | Что | Где |
+Локальная path-зависимость: пакет должен лежать рядом, в `../ui` от репозитория
+приложения (`apps/dajet/ui`). Свежий клон одного приложения без `dajet-ui` не
+соберётся — клонируйте оба рядом, как в `apps/`:
+
+```swift
+dependencies: [.package(path: "../ui")]
+// и в таргете: .product(name: "DajetUI", package: "ui")
+```
+
+## Состав
+
+**Токены** (`Sources/DajetUI/`):
+
+| Токен | Значения | Файл |
 | --- | --- | --- |
-| `Palette` | парные цвета light/dark: ground, ink, muted, faint, hairline, wash, hover, accent, onAccent, positive, caution | `Sources/DajetUI/Palette.swift` |
-| `Typography` | шкала: display 17 · body 13 · bodyMuted 12 · label 11 · caption 10 · mono 11 | `Sources/DajetUI/Typography.swift` |
-| `Radius` | chip 4 · control 8 · field 10 · item 12 · panel 16 | `Sources/DajetUI/Metrics.swift` |
-| `Spacing` | 2…16 шагом от xxs до xxxl | `Sources/DajetUI/Metrics.swift` |
-| `Metrics` | хром линейки: strip 52, door/row 26, side 232 (176–440), tab 186 | `Sources/DajetUI/Metrics.swift` |
-| `Motion` | пружины glide 0.34/0.82, settle 0.30/0.86, quick 0.14 | `Sources/DajetUI/Motion.swift` |
+| `Palette` (+ `Palette.NS` для AppKit) | ground, ink, muted, faint, hairline, wash, hover, pinLive, resting, accent, onAccent, positive, caution — пары light/dark, 13/13 бит-в-бит с браузером | `Palette.swift` |
+| `Typography` | display 17 · body 13 · bodyMuted 12 · control 11.5 · label 11 · caption 10 · mono 11 | `Typography.swift` |
+| `Radius` | chip 4 · control 8 · field 10 · item 11 · panel 16 | `Metrics.swift` |
+| `Spacing` | 2…16 шагом от xxs до xxxl | `Metrics.swift` |
+| `Metrics` | strip 52 · door/row 26 · side 232 (176–440) · tabWidth 186 · tabMinWidth 36 · tabGap 2 · lights 100 · helm 90 · bare 34 · fieldWidth 560 | `Metrics.swift` |
+| `Motion` | glide 0.34/0.82 · settle 0.30/0.86 · quick 0.14 — вычисляемые `Animation?`, nil при «Уменьшить движение»; `Motion.reduced` публичен | `Motion.swift` |
+| `Look` | system/light/dark, ключ UserDefaults `"look"`, `apply()`/`remember`/`current` | `Look.swift` |
+
+**Компоненты-минимум**: `Door`, `InkSwitch` (имя обходит `SwiftUI.Switch`),
+`Segmented`, `Pill` (`tint`/`fill` разведены), `Quick`, `Steps`, панельный набор
+`Plate`/`Card`/`Rule`/`Line`/`Caption`/`Nothing`/`Hunt` (`Pill.swift`,
+`PanelKit.swift`).
+
+**Рецепты** (`Look.swift`, `WindowRecipe.swift`, `SettingsRecipe.swift`):
+`.dajetPlateWindow` / `.dajetToolbarWindow`, Settings-сцена `DajetSettings`,
+`LookPicker`. Потребляются пока только демо — adoption приложениями по плану.
 
 ## Демо (живой гайд)
 
@@ -32,14 +55,14 @@
 swift run DajetUIDemo
 ```
 
-Окно в стиле линейки показывает все токены. Тёмная тема подхватывается
-системой автоматически.
+Окно в стиле линейки показывает токены и компоненты; ⌘, — настройки; тема
+переключается секцией «Внешний вид».
 
 ## Дорожная карта
 
-- Этап 1 — токены (этот коммит)
-- Этап 2 — компоненты-минимум: Door, Switch, Segmented, Pill, Plate/Card/Line, Hunt
-- Этап 3 — рецепты: окно + системный тулбар (uniform, macOS 27), Settings-сцена, appearance
-- Этап 4+ — миграции: плеер → редактор → браузер
+- Этап 1 — токены · Этап 2 — компоненты · Этап 3 — рецепты (✅ в main)
+- Дальше: рецепт материалов/стекла (эталон — Glass плеера), accessibility-слой,
+  перевод 226 хардкод-размеров браузера на `Typography`, Tests-пин токенов
 
 Доска проекта: https://github.com/users/bestdeejay-design/projects/4
+Аудит SZ: https://github.com/bestdeejay-design/dajet-ui/issues/1
