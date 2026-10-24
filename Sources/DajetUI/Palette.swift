@@ -32,10 +32,44 @@ public enum Palette {
 
     /// Парный цвет light/dark на основе hex-значений.
     public static func pair(_ light: UInt64, _ dark: UInt64) -> Color {
-        Color(nsColor: NSColor(name: nil) { appearance in
+        Color(nsColor: nsPair(light, dark))
+    }
+
+    /// Динамический NSColor, переключающийся темой системы.
+    static func nsPair(_ light: UInt64, _ dark: UInt64) -> NSColor {
+        NSColor(name: nil) { appearance in
             let isDark = appearance.bestMatch(from: [.darkAqua, .vibrantDark]) != nil
             return NSColor(hex: isDark ? dark : light)
-        })
+        }
+    }
+}
+
+public extension Palette {
+    /// NSColor-варианты токенов для AppKit-приложений линейки (редактор).
+    /// Значения — те же пары, что и у SwiftUI-вариантов.
+    enum NS {
+        /// Фон окна.
+        public static let ground = Palette.nsPair(0xFFFFFF, 0x1C1C1C)
+        /// Основной текст.
+        public static let ink = Palette.nsPair(0x171717, 0xEDEDED)
+        /// Вторичный текст.
+        public static let muted = Palette.nsPair(0x8C8C8C, 0x949494)
+        /// Подложки-призраки, выключенные контролы.
+        public static let faint = Palette.nsPair(0xD4D4D4, 0x525252)
+        /// Волосяные линии и обводки.
+        public static let hairline = Palette.nsPair(0xE8E8E8, 0x333333)
+        /// Заливка полей ввода.
+        public static let wash = Palette.nsPair(0xEFEFEF, 0x2D2D2D)
+        /// Состояние наведения.
+        public static let hover = Palette.nsPair(0xF6F6F6, 0x262626)
+        /// Терракота — единственный цветовой акцент линейки.
+        public static let accent = Palette.nsPair(0xC1542B, 0xE8AE8C)
+        /// Текст и глифы на акценте.
+        public static let onAccent = Palette.nsPair(0xFFFFFF, 0x0E0F11)
+        /// Успех.
+        public static let positive = Palette.nsPair(0x14803D, 0x4ADE80)
+        /// Внимание.
+        public static let caution = Palette.nsPair(0xB5540A, 0xFABF24)
     }
 }
 
