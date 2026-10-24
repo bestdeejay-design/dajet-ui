@@ -14,11 +14,13 @@ public struct Pill: View {
 
     @State private var hovering = false
 
+    /// - Parameter fill: заливка filled-пилюли; дефолт — ink, как в
+    ///   эталоне. Терракота — осознанный акцент, передаётся явно.
     public init(
         _ title: String,
         filled: Bool = false,
         tint: Color = Palette.ink,
-        fill: Color = Palette.accent,
+        fill: Color = Palette.ink,
         action: @escaping () -> Void
     ) {
         self.title = title

@@ -18,5 +18,10 @@ let package = Package(
             dependencies: ["DajetUI"],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
+        .testTarget(
+            name: "DajetUITests",
+            dependencies: ["DajetUI"],
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
     ]
 )

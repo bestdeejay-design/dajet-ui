@@ -6,6 +6,10 @@ import SwiftUI
 /// а не на отдельное окно, чтобы каждая панель, алерт и лист соглашались
 /// с окном, из которого открыты. Рецепт — `Theme` плеера Dajet
 /// (`Design.swift`), а до него `Look.apply()` браузера, дословно.
+///
+/// Пакет сознательно не держит подписей для UI: у каждого приложения
+/// линейки свой язык. Строки приносит потребитель — например, через
+/// `titles` у `LookPicker`.
 public enum Look: String, CaseIterable {
     /// Как у Mac: приложение следует Системе и меняется вместе с ней.
     case system
@@ -16,15 +20,6 @@ public enum Look: String, CaseIterable {
 
     /// Ключ, под которым выбор помнится в UserDefaults.
     static let key = "look"
-
-    /// Что написано на сегменте пикера.
-    public var title: String {
-        switch self {
-        case .system: return "Системная"
-        case .light: return "Светлая"
-        case .dark: return "Тёмная"
-        }
-    }
 
     /// Выбранный в прошлый раз вид; если выбора не было — системный,
     /// с него начинается свежая копия любого приложения линейки.
@@ -61,14 +56,18 @@ public enum Look: String, CaseIterable {
 }
 
 /// Сегмент из трёх лиц приложения: меняет всю app живьём и помнит выбор
-/// между запусками. «Системная» возвращает решение Mac.
+/// между запусками. «Системная» возвращает решение Mac. Подписи передаёт
+/// потребитель — пакет своих строк не держит.
 public struct LookPicker: View {
+    private let titles: [Look: String]
     @State private var look = Look.current
 
-    public init() {}
+    public init(titles: [Look: String]) {
+        self.titles = titles
+    }
 
     public var body: some View {
-        Segmented(Look.allCases.map { ($0, $0.title) }, selection: $look)
+        Segmented(Look.allCases.map { ($0, titles[$0] ?? "") }, selection: $look)
             .frame(width: 260)
             .onChange(of: look) {
                 Look.remember(look)

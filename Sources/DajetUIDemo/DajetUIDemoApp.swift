@@ -213,7 +213,7 @@ private struct LookTab: View {
             Caption("Тема")
             Card {
                 Line("Оформление", "Светлая, тёмная или как у Mac — применяется ко всему приложению") {
-                    LookPicker()
+                    LookPicker(titles: [.system: "Системная", .light: "Светлая", .dark: "Тёмная"])
                 }
             }
         }
@@ -225,7 +225,7 @@ private struct LookTab: View {
 private struct LookDemo: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            LookPicker()
+            LookPicker(titles: [.system: "Системная", .light: "Светлая", .dark: "Тёмная"])
             Text("system · light · dark — выбор помнится между запусками")
                 .font(Typography.mono)
                 .foregroundStyle(Palette.muted)
@@ -436,7 +436,7 @@ private struct ComponentGallery: View {
 
             HStack(spacing: 10) {
                 InkSwitch(on: $switchOn)
-                Pill("Сохранить", filled: true, action: onShowPlate)
+                Pill("Сохранить", filled: true, fill: Palette.accent, action: onShowPlate)
                 Pill("Отмена", action: {})
                 Quick("Копировать", act: {})
                 Spacer()

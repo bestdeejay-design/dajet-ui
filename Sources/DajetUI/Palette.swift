@@ -1,5 +1,24 @@
 import SwiftUI
 
+/// Единственный источник hex-пар линейки: SwiftUI-вариант `Palette` и
+/// AppKit-вариант `Palette.NS` читают одни и те же константы — рассинхрон
+/// невозможен по построению.
+private enum Pairs {
+    static let ground: (light: UInt64, dark: UInt64) = (0xFFFFFF, 0x1C1C1C)
+    static let ink: (light: UInt64, dark: UInt64) = (0x171717, 0xEDEDED)
+    static let muted: (light: UInt64, dark: UInt64) = (0x8C8C8C, 0x949494)
+    static let faint: (light: UInt64, dark: UInt64) = (0xD4D4D4, 0x525252)
+    static let hairline: (light: UInt64, dark: UInt64) = (0xE8E8E8, 0x333333)
+    static let wash: (light: UInt64, dark: UInt64) = (0xEFEFEF, 0x2D2D2D)
+    static let hover: (light: UInt64, dark: UInt64) = (0xF6F6F6, 0x262626)
+    static let pinLive: (light: UInt64, dark: UInt64) = (0xE6E6E6, 0x363636)
+    static let resting: (light: UInt64, dark: UInt64) = (0xCCCCCC, 0x4D4D4D)
+    static let accent: (light: UInt64, dark: UInt64) = (0xC1542B, 0xE8AE8C)
+    static let onAccent: (light: UInt64, dark: UInt64) = (0xFFFFFF, 0x0E0F11)
+    static let positive: (light: UInt64, dark: UInt64) = (0x14803D, 0x4ADE80)
+    static let caution: (light: UInt64, dark: UInt64) = (0xB5540A, 0xFABF24)
+}
+
 /// Единая палитра Dajet — основа интерфейса всех приложений линейки.
 ///
 /// Ахроматические пары сняты с браузера Dajet (эталонный интерфейс владельца,
@@ -8,76 +27,77 @@ import SwiftUI
 /// provider, поэтому смена light/dark происходит системой автоматически.
 public enum Palette {
     /// Фон окна.
-    public static let ground = pair(0xFFFFFF, 0x1C1C1C)
+    public static let ground = Color(nsColor: nsPair(Pairs.ground))
     /// Основной текст.
-    public static let ink = pair(0x171717, 0xEDEDED)
+    public static let ink = Color(nsColor: nsPair(Pairs.ink))
     /// Вторичный текст.
-    public static let muted = pair(0x8C8C8C, 0x949494)
+    public static let muted = Color(nsColor: nsPair(Pairs.muted))
     /// Подложки-призраки, выключенные контролы.
-    public static let faint = pair(0xD4D4D4, 0x525252)
+    public static let faint = Color(nsColor: nsPair(Pairs.faint))
     /// Волосяные линии и обводки.
-    public static let hairline = pair(0xE8E8E8, 0x333333)
+    public static let hairline = Color(nsColor: nsPair(Pairs.hairline))
     /// Заливка полей ввода и «мыльных» поверхностей.
-    public static let wash = pair(0xEFEFEF, 0x2D2D2D)
+    public static let wash = Color(nsColor: nsPair(Pairs.wash))
     /// Состояние наведения.
-    public static let hover = pair(0xF6F6F6, 0x262626)
+    public static let hover = Color(nsColor: nsPair(Pairs.hover))
     /// «Живой» пин на полосе (вкладка закреплена, приложение активно).
-    public static let pinLive = pair(0xE6E6E6, 0x363636)
+    public static let pinLive = Color(nsColor: nsPair(Pairs.pinLive))
     /// Покой полосы: приложение неактивно, хром притухает.
-    public static let resting = pair(0xCCCCCC, 0x4D4D4D)
+    public static let resting = Color(nsColor: nsPair(Pairs.resting))
     /// Терракота — единственный цветовой акцент линейки (brand).
-    public static let accent = pair(0xC1542B, 0xE8AE8C)
+    public static let accent = Color(nsColor: nsPair(Pairs.accent))
     /// Текст и глифы на залитой акцентом поверхности.
-    public static let onAccent = pair(0xFFFFFF, 0x0E0F11)
+    public static let onAccent = Color(nsColor: nsPair(Pairs.onAccent))
     /// Успех, «безопасно».
-    public static let positive = pair(0x14803D, 0x4ADE80)
+    public static let positive = Color(nsColor: nsPair(Pairs.positive))
     /// Внимание, «осторожно».
-    public static let caution = pair(0xB5540A, 0xFABF24)
+    public static let caution = Color(nsColor: nsPair(Pairs.caution))
 
-    /// Парный цвет light/dark на основе hex-значений.
+    /// Парный цвет light/dark на основе hex-значений — для токенов,
+    /// которые встречаются только в одном приложении.
     public static func pair(_ light: UInt64, _ dark: UInt64) -> Color {
-        Color(nsColor: nsPair(light, dark))
+        Color(nsColor: nsPair((light: light, dark: dark)))
     }
 
     /// Динамический NSColor, переключающийся темой системы.
-    static func nsPair(_ light: UInt64, _ dark: UInt64) -> NSColor {
+    static func nsPair(_ pair: (light: UInt64, dark: UInt64)) -> NSColor {
         NSColor(name: nil) { appearance in
             let isDark = appearance.bestMatch(from: [.darkAqua, .vibrantDark]) != nil
-            return NSColor(hex: isDark ? dark : light)
+            return NSColor(hex: isDark ? pair.dark : pair.light)
         }
     }
 }
 
 public extension Palette {
     /// NSColor-варианты токенов для AppKit-приложений линейки (редактор).
-    /// Значения — те же пары, что и у SwiftUI-вариантов.
+    /// Значения — те же пары, что и у SwiftUI-вариантов: один источник.
     enum NS {
         /// Фон окна.
-        public static let ground = Palette.nsPair(0xFFFFFF, 0x1C1C1C)
+        public static let ground = Palette.nsPair(Pairs.ground)
         /// Основной текст.
-        public static let ink = Palette.nsPair(0x171717, 0xEDEDED)
+        public static let ink = Palette.nsPair(Pairs.ink)
         /// Вторичный текст.
-        public static let muted = Palette.nsPair(0x8C8C8C, 0x949494)
+        public static let muted = Palette.nsPair(Pairs.muted)
         /// Подложки-призраки, выключенные контролы.
-        public static let faint = Palette.nsPair(0xD4D4D4, 0x525252)
+        public static let faint = Palette.nsPair(Pairs.faint)
         /// Волосяные линии и обводки.
-        public static let hairline = Palette.nsPair(0xE8E8E8, 0x333333)
+        public static let hairline = Palette.nsPair(Pairs.hairline)
         /// Заливка полей ввода.
-        public static let wash = Palette.nsPair(0xEFEFEF, 0x2D2D2D)
+        public static let wash = Palette.nsPair(Pairs.wash)
         /// Состояние наведения.
-        public static let hover = Palette.nsPair(0xF6F6F6, 0x262626)
+        public static let hover = Palette.nsPair(Pairs.hover)
         /// «Живой» пин на полосе.
-        public static let pinLive = Palette.nsPair(0xE6E6E6, 0x363636)
+        public static let pinLive = Palette.nsPair(Pairs.pinLive)
         /// Покой полосы: приложение неактивно, хром притухает.
-        public static let resting = Palette.nsPair(0xCCCCCC, 0x4D4D4D)
+        public static let resting = Palette.nsPair(Pairs.resting)
         /// Терракота — единственный цветовой акцент линейки.
-        public static let accent = Palette.nsPair(0xC1542B, 0xE8AE8C)
+        public static let accent = Palette.nsPair(Pairs.accent)
         /// Текст и глифы на акценте.
-        public static let onAccent = Palette.nsPair(0xFFFFFF, 0x0E0F11)
+        public static let onAccent = Palette.nsPair(Pairs.onAccent)
         /// Успех.
-        public static let positive = Palette.nsPair(0x14803D, 0x4ADE80)
+        public static let positive = Palette.nsPair(Pairs.positive)
         /// Внимание.
-        public static let caution = Palette.nsPair(0xB5540A, 0xFABF24)
+        public static let caution = Palette.nsPair(Pairs.caution)
     }
 }
 

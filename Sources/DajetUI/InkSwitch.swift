@@ -23,5 +23,15 @@ public struct InkSwitch: View {
             .contentShape(Capsule())
             .onTapGesture { withAnimation(Motion.settle) { on.toggle() } }
             .animation(Motion.settle, value: on)
+            .accessibilityElement(children: .ignore)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityValue(on ? "1" : "0")
+            .accessibilityAdjustableAction { direction in
+                guard case .increment = direction else {
+                    withAnimation(Motion.settle) { on = false }
+                    return
+                }
+                withAnimation(Motion.settle) { on = true }
+            }
     }
 }

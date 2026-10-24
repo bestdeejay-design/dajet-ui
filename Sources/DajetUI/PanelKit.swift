@@ -11,6 +11,7 @@ import SwiftUI
 public struct Plate<Content: View, Foot: View>: View {
     let title: String
     var width: CGFloat = 560
+    var closeHelp = "Done   esc"
     let close: () -> Void
     @ViewBuilder let content: () -> Content
     @ViewBuilder let foot: () -> Foot
@@ -18,12 +19,14 @@ public struct Plate<Content: View, Foot: View>: View {
     public init(
         _ title: String,
         width: CGFloat = 560,
+        closeHelp: String = "Done   esc",
         close: @escaping () -> Void,
         @ViewBuilder content: @escaping () -> Content,
         @ViewBuilder foot: @escaping () -> Foot
     ) {
         self.title = title
         self.width = width
+        self.closeHelp = closeHelp
         self.close = close
         self.content = content
         self.foot = foot
@@ -36,7 +39,7 @@ public struct Plate<Content: View, Foot: View>: View {
                     .font(Typography.display)
                     .foregroundStyle(Palette.ink)
                 Spacer(minLength: 0)
-                Door("xmark", help: "Готово   esc", act: close)
+                Door("xmark", help: closeHelp, act: close)
             }
             .padding(.horizontal, 22)
             .padding(.top, 18)
@@ -185,7 +188,7 @@ public struct Nothing: View {
 /// браузера Dajet (`Plate.swift`).
 public struct Hunt: View {
     @Binding var text: String
-    var prompt = "Поиск"
+    var prompt = "Search"
     var focus: FocusState<Bool>.Binding
 
     public init(
@@ -220,6 +223,7 @@ public struct Hunt: View {
                         .foregroundStyle(Palette.faint)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Clear")
             }
         }
         .padding(.horizontal, 12)

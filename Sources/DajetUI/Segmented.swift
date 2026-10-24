@@ -12,12 +12,15 @@ public struct Segmented<Option: Hashable>: View {
 
     @Namespace private var slide
 
+    /// Повторная опция в списке — ошибка данных, а не крэш `ForEach`:
+    /// первая остаётся, дубль отбрасывается.
     public init(
         _ options: [(Option, String)],
         selection: Binding<Option>,
         wide: Bool = false
     ) {
-        self.options = options
+        var seen = Set<Option>()
+        self.options = options.filter { seen.insert($0.0).inserted }
         self._selection = selection
         self.wide = wide
     }
