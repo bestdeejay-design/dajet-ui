@@ -39,7 +39,7 @@ public enum Look: String, CaseIterable {
 
     /// Что сказать приложению. Для `system` — ничего: приложение тогда
     /// следует за Mac и меняется вместе с ним.
-    var appearance: NSAppearance? {
+    public var appearance: NSAppearance? {
         switch self {
         case .system: return nil
         case .light: return NSAppearance(named: .aqua)
